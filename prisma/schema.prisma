@@ -12,7 +12,7 @@ model Product {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String   // Pas de @unique avec MongoDB
   subtitle    String?
-  price       String?
+  price       Float?
   description String
   traditionalUse String
   disclaimer  String   @default("Ce produit est un témoignage d'un savoir-faire traditionnel. Il ne s'agit pas d'un médicament...")

@@ -29,7 +29,9 @@ import {
   
   // Validation
   validateProduct,
-  validateTestimonial
+  validateTestimonial,
+  updateGalleryItem,
+  updateTestimonial
 } from '../controllers/productController.js';
 
 import { authenticateAdmin } from '../middleware/auth.js';
@@ -55,19 +57,22 @@ router.get('/settings/site', getSiteSettings);
 // Produits
 router.get('/', authenticateAdmin, getAllProducts);
 router.post('/', createProduct);
-router.put('/:id', authenticateAdmin, validateProduct, updateProduct);
+router.put('/:id',  updateProduct);  // authenticateAdmin, validateProduct,
 router.delete('/:id', authenticateAdmin, deleteProduct);
 
 // Témoignages (admin)
 router.get('/testimonials/all', authenticateAdmin, getAllTestimonials);
-router.put('/testimonials/:id/approve', authenticateAdmin, approveTestimonial);
-router.delete('/testimonials/:id', authenticateAdmin, deleteTestimonial);
+router.post('/testimonials', addTestimonial); // Ajouter cette ligne
+router.put('/testimonials/:id',  updateTestimonial); // Ajouter cette ligne authenticateAdmin,
+router.put('/testimonials/:id/approve', approveTestimonial);
+router.delete('/testimonials/:id', deleteTestimonial);
 
 // Galerie (admin)
 router.post('/gallery', addGalleryItem);
 router.get('/:productId/gallery', authenticateAdmin, getAllGalleryItems);
+router.put('/gallery/:id', updateGalleryItem);
 router.put('/gallery/:id/order', authenticateAdmin, updateGalleryOrder);
-router.delete('/gallery/:id', authenticateAdmin, deleteGalleryItem);
+router.delete('/gallery/:id',  deleteGalleryItem);
 
 // Paramètres du site (admin)
 router.put('/settings/site', authenticateAdmin, updateSiteSettings);

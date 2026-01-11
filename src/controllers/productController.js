@@ -55,7 +55,7 @@ export const getMainProduct = async (req, res) => {
     let product = await prisma.product.findFirst({
       include: {
         testimonials: {
-          where: { approved: false },
+        //   where: { approved: false },
           orderBy: { createdAt: 'desc' }
         },
         galleries: {
@@ -86,47 +86,6 @@ export const getMainProduct = async (req, res) => {
       galleries: [],
       id: 'default'
     });
-  }
-};
-
-// Créer un produit (admin)
-export const createProductOLD = async (req, res) => {
-  try {
-    const {
-      title,
-      subtitle,
-      description,
-      traditionalUse,
-      disclaimer,
-      mainImage,
-      images
-    } = req.body;
-
-    console.log("req.body", req.body);
-    // Vérifier si un produit avec ce titre existe déjà
-    const existingProduct = await prisma.product.findFirst({
-      where: { title }
-    });
-
-    if (existingProduct) {
-      return res.status(400).json({ error: 'Un produit avec ce titre existe déjà' });
-    }
-
-    const product = await prisma.product.create({
-      data: {
-        title,
-        subtitle,
-        description,
-        traditionalUse,
-        disclaimer: disclaimer || initialProductData.disclaimer,
-        mainImage,
-        images: images || []
-      }
-    });
-
-    res.status(201).json(product);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
   }
 };
 
@@ -250,6 +209,36 @@ export const updateProduct = async (req, res) => {
   }
 };
 
+// Mettre à jour une galerie (modification complète)
+export const updateGalleryItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, type, order, imageUrl } = req.body;
+
+    // Validation
+    if (!title || !imageUrl) {
+      return res.status(400).json({ 
+        error: 'Le titre et l\'URL du média sont requis' 
+      });
+    }
+
+    const galleryItem = await prisma.gallery.update({
+      where: { id },
+      data: {
+        title,
+        type,
+        order: parseInt(order) || 0,
+        imageUrl,
+        videoUrl: type === 'video' ? imageUrl : null
+      }
+    });
+
+    res.json(galleryItem);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 // Supprimer un produit (admin)
 export const deleteProduct = async (req, res) => {
   try {
@@ -316,6 +305,39 @@ export const addTestimonial = async (req, res) => {
     });
 
     res.status(201).json(testimonial);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Dans productController.js - Ajoutez cette fonction
+export const updateTestimonial = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, location, text, rating, avatar } = req.body;
+
+    // Validation des champs requis
+    if (!name || !text) {
+      return res.status(400).json({ error: 'Le nom et le texte sont obligatoires' });
+    }
+
+    const ratingValue = parseInt(rating);
+    if (ratingValue < 1 || ratingValue > 5) {
+      return res.status(400).json({ error: 'Le rating doit être entre 1 et 5' });
+    }
+
+    const testimonial = await prisma.testimonial.update({
+      where: { id },
+      data: {
+        name,
+        location,
+        text,
+        rating: ratingValue,
+        avatar: avatar || null
+      }
+    });
+
+    res.json(testimonial);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

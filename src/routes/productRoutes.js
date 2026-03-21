@@ -41,7 +41,7 @@ const router = express.Router();
 // ==================== ROUTES PUBLIQUES ====================
 
 // Produit principal (pour le frontend)
-router.get('/main', getMainProduct);
+router.get('/main', getAllProducts);
 
 // Récupérer un produit spécifique
 router.get('/:id', getProduct);
